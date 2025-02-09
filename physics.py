@@ -56,7 +56,7 @@ def magnetic_field_body_frame(q0123, B_ECI):
     [2*(q1*q3 + q0*q2), 2*(q2*q3 - q0*q1), q0*q0 - q1*q1 - q2*q2 + q3*q3,]
   ])
 
-  return A*B_ECI
+  return A @ B_ECI
 
 
 
