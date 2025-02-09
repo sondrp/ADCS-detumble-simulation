@@ -56,7 +56,7 @@ class OrbitalElements:
             ]
         )
 
-    def state(self, t):
+    def evaluate(self, t):
         """
         t: time since passage of perigee
         returns: array([x1, x2, x3, v1, v2, v3]) # position and velocity
@@ -85,7 +85,7 @@ class OrbitalElements:
 
 # Example:
 
-a = 1.0  # AU
+a = 400000+6378000  # meters, ISS height + earth radius
 e = 0  # the ISS has very close to 0 eccentricity
 
 i = 56 * np.pi / 180  # inclination of ISS
@@ -93,18 +93,22 @@ raan = 0.0
 aop = 0.0
 m = 0.0
 
-h = 0.01
-steps = int(2 / h)
-tout = np.linspace(0, 2, steps)
+# maybe rather calculate the time it takes to go around once?
+
+t_final = 5400
+h = 100
+steps = int(t_final / h)
+
+tout = np.linspace(0, t_final, steps)
 xout = np.zeros((steps, 3))
 vout = np.zeros((steps, 3))
 
 orbital_elements = OrbitalElements(a, e, m, i, raan, aop)
 
-for index, t in enumerate(tout):
-    x, v = orbital_elements.state(t)
-    xout[index] = x
-    vout[index] = v
+for i, t in enumerate(tout):
+    x, v = orbital_elements.evaluate(t)
+    xout[i] = x
+    vout[i] = v
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111, projection="3d")
