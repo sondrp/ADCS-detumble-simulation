@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from igrf import (
     evaluate_magnetic_field_inertial,
     evaluate_magnetic_field_inertial_quaternion,
-    mag_from_pos,
 )
 from inertia import omega_derivative
 from orbital_elements import OrbitalElements
@@ -85,9 +84,6 @@ for i, t in enumerate(t_integrated):
     k4 = derivative(state + h * k3, t + h)
 
     state += (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
-    if np.isnan(state).any():
-      raise ValueError("NaN detected in state! Check numerical stability.")
-
 
 ### Plotting ###
 fig3d = plt.figure(figsize=(6, 5))
