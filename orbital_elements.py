@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 M = 5.9722e24
 G = 6.6743e-11
@@ -59,7 +60,7 @@ class RotationMatrix:
 
         A21 = -np.cos(raan) * np.sin(aop) - np.sin(raan) * np.cos(aop) * np.cos(i)
         A22 = -np.sin(raan) * np.sin(aop) + np.cos(raan) * np.cos(aop) * np.cos(i)
-        A23 = np.sin(raan) * np.sin(i)
+        A23 = np.cos(raan) * np.sin(i)
 
         self.A = np.array(
             [
@@ -105,3 +106,56 @@ def orbital_elements_to_position_and_velocity(a, e, m0, i, raan, aop, t):
     vel = rotation_matrix.multiply(xdot, ydot)
 
     return pos, vel
+
+
+# Example:
+
+a = 1.0  # AU
+e = 0   # the ISS has very close to 0 inclination
+
+i = 56*np.pi / 180  
+raan = 0.0
+aop = 0.0
+m = 0.0
+
+h = 0.01
+steps = int(2 / h)
+tout = np.linspace(0, 2, steps)
+xout = np.zeros((steps, 3))
+vout = np.zeros((steps, 3))
+
+for index, t in enumerate(tout):
+  x, v = orbital_elements_to_position_and_velocity(a, e, m, i, raan, aop, t)
+  xout[index] = x
+  vout[index] = v
+ 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+
+x = xout[:, 0]
+y = xout[:, 1]
+z = xout[:, 2]
+
+ax.scatter(x, y, z, c='b', marker='o')
+
+# Set equal aspect ratio
+max_range = np.array([x.max() - x.min(), y.max() - y.min(), z.max() - z.min()]).max() / 2.0
+mid_x = (x.max() + x.min()) / 2.0
+mid_y = (y.max() + y.min()) / 2.0
+mid_z = (z.max() + z.min()) / 2.0
+
+ax.set_xlim(mid_x - max_range, mid_x + max_range)
+ax.set_ylim(mid_y - max_range, mid_y + max_range)
+ax.set_zlim(mid_z - max_range, mid_z + max_range)
+
+ax.set_xlabel("X Axis")
+ax.set_ylabel("Y Axis")
+ax.set_zlabel("Z Axis")
+
+ax.set_xlabel('X Axis')
+ax.set_ylabel('Y Axis')
+ax.set_zlabel('Z Axis')
+ax.set_title('3D Surface Plot')
+
+plt.tight_layout()
+plt.show()
