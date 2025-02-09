@@ -1,9 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from igrf import evaluate_magnetic_field_inertial, evaluate_magnetic_field_inertial_quaternion
+from igrf import (
+    evaluate_magnetic_field_inertial,
+    evaluate_magnetic_field_inertial_quaternion,
+    mag_from_pos,
+)
+from inertia import omega_derivative
 from orbital_elements import OrbitalElements
-from quaternions import euler_to_quaternion, omega_derivative, quaternion_derivative, quaternion_to_euler
+from quaternions import (
+    euler_to_quaternion,
+    quaternion_derivative,
+    quaternion_to_euler,
+)
 
 ### Orbital dynamics ###
 # Analytical solution exist, so no need to integrate
@@ -30,18 +39,20 @@ for i, t in enumerate(t_orbit):
 ### Rotational dynamics ###
 # Integrated with RK4
 
+
 def derivative(state):
     omega = state[0:3]
     q0123 = state[3:7]
-    
+
     omegadot = omega_derivative(omega)
     q0123dot = quaternion_derivative(q0123, omega)
 
     return np.hstack([omegadot, q0123dot])
 
+
 # initial conditions
 q0123 = euler_to_quaternion([0, 0, 0])
-omega = np.array([0.6, -0.5, -0.4]) # initial angular velocity 
+omega = np.array([0.01, 0.01, 0])  # initial angular velocity
 
 h = 1
 t_final = 5400
@@ -54,7 +65,7 @@ mag_integrated = np.zeros((steps, 3))
 
 state = np.hstack([omega, q0123])
 
-for i, t in enumerate(t_integrated): 
+for i, t in enumerate(t_integrated):
     q0123 = np.array(state[3:7])
     omega_integrated[i] = np.array(state[0:3])
     q0123_integrated[i] = q0123
@@ -63,11 +74,11 @@ for i, t in enumerate(t_integrated):
     mag_integrated[i] = evaluate_magnetic_field_inertial_quaternion(x, q0123)
 
     k1 = derivative(state)
-    k2 = derivative(state + 0.5*h*k1)
-    k3 = derivative(state + 0.5*h*k2)
-    k4 = derivative(state + h*k3)
+    k2 = derivative(state + h * k1 / 2)
+    k3 = derivative(state + h * k2 / 2)
+    k4 = derivative(state + h * k3)
 
-    state += (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+    state += (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
 ### Plotting ###
 fig3d = plt.figure(figsize=(6, 5))

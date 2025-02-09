@@ -70,21 +70,3 @@ def quaternion_to_euler(q0123):
   yaw = np.atan2(siny_cosp, cosy_cosp)
 
   return roll, pitch, yaw
-
-# TODO : move this somewhere else
-
-# Inertia of satellite
-I = np.array([
-    [0.9, 0, 0],
-    [0, 0.9, 0], 
-    [0, 0, 0.3]
-])
-
-invI = np.linalg.inv(I)
-
-LMN_magnetorquer = np.array([0, 0, 0])
-
-
-def omega_derivative(omega):
-    H = I @ omega
-    return invI @ (LMN_magnetorquer - np.cross(omega, H))
