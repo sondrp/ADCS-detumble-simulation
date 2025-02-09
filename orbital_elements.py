@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 
 # Solve Kepler's equation for E
@@ -81,71 +81,3 @@ class OrbitalElements:
         vel = A @ np.array([xdot, ydot])
 
         return pos, vel
-
-
-# Example:
-
-a = 400000+6378000  # meters, ISS height + earth radius
-e = 0  # the ISS has very close to 0 eccentricity
-
-i = 56 * np.pi / 180  # inclination of ISS
-raan = 0.0
-aop = 0.0
-m = 0.0
-
-# maybe rather calculate the time it takes to go around once?
-
-t_final = 5400
-h = 100
-steps = int(t_final / h)
-
-tout = np.linspace(0, t_final, steps)
-xout = np.zeros((steps, 3))
-vout = np.zeros((steps, 3))
-
-orbital_elements = OrbitalElements(a, e, m, i, raan, aop)
-
-for i, t in enumerate(tout):
-    x, v = orbital_elements.evaluate(t)
-    xout[i] = x
-    vout[i] = v
-
-fig = plt.figure()
-ax1 = fig.add_subplot(111, projection="3d")
-
-x = xout[:, 0]
-y = xout[:, 1]
-z = xout[:, 2]
-
-ax1.scatter(x, y, z, c="b", marker="o")
-
-# Set equal aspect ratio
-max_range = (
-    np.array([x.max() - x.min(), y.max() - y.min(), z.max() - z.min()]).max() / 2.0
-)
-mid_x = (x.max() + x.min()) / 2.0
-mid_y = (y.max() + y.min()) / 2.0
-mid_z = (z.max() + z.min()) / 2.0
-
-ax1.set_xlim(mid_x - max_range, mid_x + max_range)
-ax1.set_ylim(mid_y - max_range, mid_y + max_range)
-ax1.set_zlim(mid_z - max_range, mid_z + max_range)
-
-ax1.set_xlabel("X Axis")
-ax1.set_ylabel("Y Axis")
-ax1.set_zlabel("Z Axis")
-
-ax1.set_xlabel("X Axis")
-ax1.set_ylabel("Y Axis")
-ax1.set_zlabel("Z Axis")
-ax1.set_title("3D Surface Plot")
-
-plt.tight_layout()
-plt.show()
-
-vnorm = [np.linalg.norm(v) for v in vout]
-plt.plot(tout, vout[:, 0])
-plt.plot(tout, vout[:, 1])
-plt.plot(tout, vout[:, 2])
-plt.plot(tout, vnorm)
-plt.show()
