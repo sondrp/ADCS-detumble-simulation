@@ -130,13 +130,13 @@ for index, t in enumerate(tout):
   vout[index] = v
  
 fig = plt.figure()
-ax = fig.add_subplot(111, projection="3d")
+ax1 = fig.add_subplot(111, projection="3d")
 
 x = xout[:, 0]
 y = xout[:, 1]
 z = xout[:, 2]
 
-ax.scatter(x, y, z, c='b', marker='o')
+ax1.scatter(x, y, z, c='b', marker='o')
 
 # Set equal aspect ratio
 max_range = np.array([x.max() - x.min(), y.max() - y.min(), z.max() - z.min()]).max() / 2.0
@@ -144,18 +144,26 @@ mid_x = (x.max() + x.min()) / 2.0
 mid_y = (y.max() + y.min()) / 2.0
 mid_z = (z.max() + z.min()) / 2.0
 
-ax.set_xlim(mid_x - max_range, mid_x + max_range)
-ax.set_ylim(mid_y - max_range, mid_y + max_range)
-ax.set_zlim(mid_z - max_range, mid_z + max_range)
+ax1.set_xlim(mid_x - max_range, mid_x + max_range)
+ax1.set_ylim(mid_y - max_range, mid_y + max_range)
+ax1.set_zlim(mid_z - max_range, mid_z + max_range)
 
-ax.set_xlabel("X Axis")
-ax.set_ylabel("Y Axis")
-ax.set_zlabel("Z Axis")
+ax1.set_xlabel("X Axis")
+ax1.set_ylabel("Y Axis")
+ax1.set_zlabel("Z Axis")
 
-ax.set_xlabel('X Axis')
-ax.set_ylabel('Y Axis')
-ax.set_zlabel('Z Axis')
-ax.set_title('3D Surface Plot')
+ax1.set_xlabel('X Axis')
+ax1.set_ylabel('Y Axis')
+ax1.set_zlabel('Z Axis')
+ax1.set_title('3D Surface Plot')
 
 plt.tight_layout()
 plt.show()
+
+vnorm = [np.linalg.norm(v) for v in vout]
+plt.plot(tout, vout[:, 0])
+plt.plot(tout, vout[:, 1])
+plt.plot(tout, vout[:, 2])
+plt.plot(tout, vnorm)
+plt.show()
+
