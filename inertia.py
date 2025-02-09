@@ -7,27 +7,18 @@ invI = np.linalg.inv(I)
 
 LMN_magnetorquer = np.array([0, 0, 0])
 
-k = 67200
+k = k = 0.01  # Reduce gain and tune experimentally
 
 n = 84
 A = 0.02
 
 
-def omega_derivative(omega):
+def omega_derivative(omega, B):
+    m = (-k / np.linalg.norm(B) ** 2) * np.cross(B, omega)  # magnetic dipole moment
 
-    #current = get_current(omega, B)
-    #mu_B = current*n*A
+    LMN_magnetorquer = np.cross(m, B)  # control torque
 
-    #LMN_magnetorquer = np.cross(mu_B, BB)
+    H = I @ omega  # angular momentum
 
-    H = I @ omega
+    # controlled change in angular momentum
     return invI @ (LMN_magnetorquer - np.cross(omega, H))
-
-
-def get_current(omega, B):
-    current = k * np.cross(omega, B) / (n * A)
-
-    if np.sum(np.abs(current)) > 0.04:
-        current = current / np.linalg.norm(current) * 0.04
-
-    return current

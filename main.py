@@ -40,11 +40,14 @@ for i, t in enumerate(t_orbit):
 # Integrated with RK4
 
 
-def derivative(state):
+def derivative(state, t):
     omega = state[0:3]
     q0123 = state[3:7]
 
-    omegadot = omega_derivative(omega)
+    x, _ = orbital_elements.evaluate(t)
+    B = evaluate_magnetic_field_inertial_quaternion(x, q0123)
+
+    omegadot = omega_derivative(omega, B)
     q0123dot = quaternion_derivative(q0123, omega)
 
     return np.hstack([omegadot, q0123dot])
@@ -67,18 +70,24 @@ state = np.hstack([omega, q0123])
 
 for i, t in enumerate(t_integrated):
     q0123 = np.array(state[3:7])
+    q0123 /= np.linalg.norm(q0123)  # Normalize quaternion
+    state[3:7] = q0123
+
     omega_integrated[i] = np.array(state[0:3])
     q0123_integrated[i] = q0123
 
     x, _ = orbital_elements.evaluate(t)
     mag_integrated[i] = evaluate_magnetic_field_inertial_quaternion(x, q0123)
 
-    k1 = derivative(state)
-    k2 = derivative(state + h * k1 / 2)
-    k3 = derivative(state + h * k2 / 2)
-    k4 = derivative(state + h * k3)
+    k1 = derivative(state, t)
+    k2 = derivative(state + h * k1 / 2, t + h / 2)
+    k3 = derivative(state + h * k2 / 2, t + h / 2)
+    k4 = derivative(state + h * k3, t + h)
 
     state += (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+    if np.isnan(state).any():
+      raise ValueError("NaN detected in state! Check numerical stability.")
+
 
 ### Plotting ###
 fig3d = plt.figure(figsize=(6, 5))
