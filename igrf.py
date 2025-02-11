@@ -35,10 +35,9 @@ def evaluate_magnetic_field_inertial(x):
     return mag_from_pos(x)
 
 
-def mag_from_pos(x):
-    rho, phi, theta, psi = cartesian_to_angles(x)
-    lat, long, alt_km = cartesian_to_lat_long(rho, phi, theta, psi)
-    field = get_magnetic_field(lat, long, alt_km, datetime(2025, 1, 1))
+def mag_from_pos(x, time=datetime(2025, 1, 1)):
+    lat, long, alt_km = cartesian_to_lat_long(x)
+    field = get_magnetic_field(lat, long, alt_km, time)
 
     return np.array(field[3:6])
 
@@ -53,7 +52,8 @@ def cartesian_to_angles(x):
     return rho, phi, theta, psi
 
 
-def cartesian_to_lat_long(rho, phi, theta, psi):
+def cartesian_to_lat_long(x):
+    rho, _phi, theta, psi = cartesian_to_angles(x)
     lat = 90 - theta * 180 / np.pi
     long = psi * 180 / np.pi
     alt_km = (rho - R) / 1000
